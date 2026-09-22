@@ -4,15 +4,6 @@
 
 ---
 
-## 🚀 Live Deployment
-
-| Service | URL |
-|:--------|:----|
-| **Backend API** | https://alumini-connect-08od.onrender.com |
-| **Frontend** | *(Deploy as Render Static Site — see below)* |
-
----
-
 ## 🏗️ Project Structure
 
 ```
