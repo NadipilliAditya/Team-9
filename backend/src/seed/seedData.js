@@ -60,7 +60,12 @@ async function seedDatabase(forceReset = false) {
         });
         console.log(`✅  Predefined Admin seeded: ${acc.email}`);
       } else {
+        const isMatch = await bcrypt.compare(acc.password, adm.passwordHash);
         let needsSave = false;
+        if (!isMatch) {
+          adm.passwordHash = await bcrypt.hash(acc.password, 10);
+          needsSave = true;
+        }
         if (adm.role !== 'admin') { adm.role = 'admin'; needsSave = true; }
         if (adm.status !== 'ACTIVE') { adm.status = 'ACTIVE'; needsSave = true; }
         if (!adm.phone || !/^[0-9]{10}$/.test(adm.phone)) { adm.phone = acc.phone; needsSave = true; }
