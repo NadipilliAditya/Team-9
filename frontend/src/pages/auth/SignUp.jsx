@@ -178,35 +178,54 @@ export default function SignUp({ initialRole = 'student', onNavigateToSignIn, on
                 CREATE ACCOUNT
               </h2>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Select your role and enter your details to sign up.
+                Registering for {selectedRole === 'alumni' ? 'Alumni' : 'Student'} Portal access.
               </p>
             </div>
-
-            {/* Role Switcher Tabs (Alumni & Student Only) */}
-            <div className="bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 flex gap-1.5">
-              {Object.values(roleMeta).map((r) => {
-                const isActive = selectedRole === r.id;
-                const Icon = r.icon;
-                return (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedRole(r.id);
-                      setError('');
-                    }}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 cursor-pointer ${
-                      isActive 
-                        ? 'bg-[#0F4C81] text-white shadow-md' 
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-amber-300' : 'text-slate-400'}`} />
-                    <span>Sign up as {r.title}</span>
-                  </button>
-                );
-              })}
-            </div>
+            {selectedRole === 'alumni' ? (
+              <div className="bg-sky-50 border border-sky-200/80 p-3.5 rounded-2xl flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#0284C7] flex items-center justify-center text-white shadow-sm">
+                    <GraduationCap className="w-5 h-5 text-amber-300" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-sky-800 uppercase tracking-wider block">Registration Role</span>
+                    <span className="text-sm font-black text-slate-900">Alumni</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedRole('student');
+                    setError('');
+                  }}
+                  className="text-xs font-bold text-[#0284C7] hover:underline cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-sky-200 shadow-xs"
+                >
+                  Switch to Student
+                </button>
+              </div>
+            ) : (
+              <div className="bg-emerald-50 border border-emerald-200/80 p-3.5 rounded-2xl flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#059669] flex items-center justify-center text-white shadow-sm">
+                    <BookOpen className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">Registration Role</span>
+                    <span className="text-sm font-black text-slate-900">Student</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedRole('alumni');
+                    setError('');
+                  }}
+                  className="text-xs font-bold text-[#059669] hover:underline cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-emerald-200 shadow-xs"
+                >
+                  Switch to Alumni
+                </button>
+              </div>
+            )}
 
             {/* Error / Success Feedback */}
             {error && (

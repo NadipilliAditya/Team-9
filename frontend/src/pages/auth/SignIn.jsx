@@ -51,7 +51,8 @@ export default function SignIn({
   onLoginSuccess 
 }) {
   const { login } = useAuth();
-  const [selectedRole, setSelectedRole] = useState(initialRole || 'admin');
+  const [selectedRole, setSelectedRole] = useState(initialRole || 'student');
+  const [showRoleSelector, setShowRoleSelector] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -66,6 +67,7 @@ export default function SignIn({
 
   const handleRoleChange = (roleKey) => {
     setSelectedRole(roleKey);
+    setShowRoleSelector(false);
     setError('');
     setForm({ email: '', password: '' });
   };
@@ -162,28 +164,68 @@ export default function SignIn({
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Select your portal role and enter your details.</p>
             </div>
 
-            {/* Role Switcher Tabs */}
-            <div className="bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 flex gap-1.5">
-              {Object.values(roleMeta).map((role) => {
-                const isActive = selectedRole === role.id;
-                const Icon = role.icon;
-                return (
+            {/* Role Header & Selection: Shows ONLY active role by default */}
+            {!showRoleSelector ? (
+              <div className={`p-3.5 rounded-2xl border flex items-center justify-between shadow-xs ${
+                selectedRole === 'student'
+                  ? 'bg-emerald-50 border-emerald-200/80 text-emerald-900'
+                  : selectedRole === 'alumni'
+                  ? 'bg-sky-50 border-sky-200/80 text-sky-900'
+                  : 'bg-blue-50 border-blue-200/80 text-blue-900'
+              }`}>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm ${
+                    selectedRole === 'student' ? 'bg-[#059669]' : selectedRole === 'alumni' ? 'bg-[#0284C7]' : 'bg-[#0F4C81]'
+                  }`}>
+                    <RoleIcon className={`w-5 h-5 ${selectedRole === 'student' ? 'text-white' : 'text-amber-300'}`} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider block opacity-75">Sign In Portal</span>
+                    <span className="text-sm font-black text-slate-900">{currentRole.title}</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowRoleSelector(true)}
+                  className="text-xs font-bold text-[#0F4C81] hover:underline cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-xs"
+                >
+                  Change Role
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 flex gap-1.5">
+                  {Object.values(roleMeta).map((role) => {
+                    const isActive = selectedRole === role.id;
+                    const Icon = role.icon;
+                    return (
+                      <button
+                        key={role.id}
+                        type="button"
+                        onClick={() => handleRoleChange(role.id)}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 cursor-pointer ${
+                          isActive 
+                            ? 'bg-[#0F4C81] text-white shadow-md' 
+                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                        }`}
+                      >
+                        <Icon className={`w-4 h-4 ${isActive ? 'text-amber-300' : 'text-slate-400'}`} />
+                        {role.title}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="text-right">
                   <button
-                    key={role.id}
                     type="button"
-                    onClick={() => handleRoleChange(role.id)}
-                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 cursor-pointer ${
-                      isActive 
-                        ? 'bg-[#0F4C81] text-white shadow-md' 
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-                    }`}
+                    onClick={() => setShowRoleSelector(false)}
+                    className="text-[11px] font-semibold text-slate-500 hover:text-slate-800"
                   >
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-amber-300' : 'text-slate-400'}`} />
-                    {role.title}
+                    Cancel
                   </button>
-                );
-              })}
-            </div>
+                </div>
+              </div>
+            )}
 
             {/* Error Message */}
             {error && (
