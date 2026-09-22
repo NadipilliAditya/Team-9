@@ -4,7 +4,7 @@ const studentSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    default: null
   },
   name: {
     type: String,
@@ -16,6 +16,10 @@ const studentSchema = new mongoose.Schema({
     required: true,
     lowercase: true,
     trim: true
+  },
+  password: {
+    type: String,
+    default: '1234'
   },
   phone: {
     type: String,

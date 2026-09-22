@@ -2,6 +2,7 @@ require('dotenv').config();
 const app = require('./app');
 const connectDB = require('./src/config/db');
 const seedDatabase = require('./src/seed/seedData');
+const syncUsersAndPasswords = require('./src/utils/syncUsers');
 const { applyInactivityCheck } = require('./src/utils/inactivityHelper');
 
 const PORT = process.env.PORT || 5000;
@@ -9,6 +10,7 @@ const PORT = process.env.PORT || 5000;
 async function startServer() {
   await connectDB();
   await seedDatabase(false);
+  await syncUsersAndPasswords();
   await applyInactivityCheck();
 
   const server = app.listen(PORT, () => {

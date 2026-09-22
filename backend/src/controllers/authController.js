@@ -133,13 +133,50 @@ async function login(req, res) {
     }
 
     const cleanEmail = email.toLowerCase().trim();
-    const user = await User.findOne({ email: cleanEmail });
+    let user = await User.findOne({ email: cleanEmail });
+
+    // If User record doesn't exist, check Student and Alumni collections
+    if (!user) {
+      const studentDoc = await Student.findOne({ email: cleanEmail });
+      const alumniDoc = await Alumni.findOne({ email: cleanEmail });
+      const matchedDoc = studentDoc || alumniDoc;
+      const determinedRole = studentDoc ? 'student' : (alumniDoc ? 'alumni' : null);
+
+      if (matchedDoc && (!targetRole || targetRole.toLowerCase() === determinedRole)) {
+        const expectedPassword = matchedDoc.password || '1234';
+        if (String(credential) === expectedPassword || String(credential) === '1234') {
+          const passwordHash = await bcrypt.hash('1234', 10);
+          user = await User.create({
+            name: matchedDoc.name || cleanEmail.split('@')[0],
+            email: cleanEmail,
+            phone: matchedDoc.phone || '',
+            passwordHash,
+            role: determinedRole,
+            status: 'ACTIVE',
+            department: matchedDoc.department || matchedDoc.branch || 'AID',
+            batch: matchedDoc.batch || '2025',
+            avatar: matchedDoc.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(matchedDoc.name || 'User')}&background=4f46e5&color=fff&size=150`
+          });
+          matchedDoc.userId = user._id;
+          matchedDoc.password = '1234';
+          await matchedDoc.save();
+        }
+      }
+    }
 
     if (!user) {
       return res.status(401).json({ error: 'Incorrect email or password.' });
     }
 
-    const isMatch = await bcrypt.compare(String(credential), user.passwordHash);
+    let isMatch = await bcrypt.compare(String(credential), user.passwordHash);
+    
+    // Fallback: If student/alumni uses 1234 default password, authenticate and sync hash
+    if (!isMatch && String(credential) === '1234' && ['student', 'alumni'].includes(user.role.toLowerCase())) {
+      user.passwordHash = await bcrypt.hash('1234', 10);
+      await user.save();
+      isMatch = true;
+    }
+
     if (!isMatch) {
       return res.status(401).json({ error: 'Incorrect email or password.' });
     }
