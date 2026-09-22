@@ -37,7 +37,7 @@ export default function ManageAlumni({ onBack, onToggleSidebar }) {
       setAlumni(res.data?.data || []);
     } catch (err) {
       console.error('Failed to load alumni:', err);
-      setApiError('Could not connect to server. Check backend is running on port 5000.');
+      setApiError('Could not connect to server. Check backend is running and accessible.');
     } finally {
       setLoading(false);
     }
