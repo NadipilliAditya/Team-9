@@ -8,11 +8,19 @@ const app = express();
 // CORS Configuration
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || /^http:\/\/localhost:\d+$/.test(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    // Allow requests with no origin (like mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    // Allow localhost, render.com subdomains, or any custom client URL
+    if (
+      /^http:\/\/localhost:\d+$/.test(origin) ||
+      /\.onrender\.com$/.test(origin) ||
+      origin === process.env.CLIENT_URL ||
+      process.env.NODE_ENV !== 'production'
+    ) {
+      return callback(null, true);
     }
+    // Permissive fallback so production frontend is never blocked
+    return callback(null, true);
   },
   credentials: true
 }));

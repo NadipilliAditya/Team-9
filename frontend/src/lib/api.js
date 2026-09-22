@@ -1,10 +1,20 @@
 // Resilient API client — real backend first
 import axios from 'axios';
 
+const getBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
+  if (envUrl) {
+    return envUrl.endsWith('/api') ? envUrl : `${envUrl}/api`;
+  }
+  return import.meta.env.PROD 
+    ? 'https://alumini-connect-08od.onrender.com/api' 
+    : 'http://localhost:5000/api';
+};
+
 // ─── Real axios instance pointing at Express backend ─────────────────────────
 const realAxios = axios.create({
-  baseURL: 'http://localhost:5000/api',
-  timeout: 10000,
+  baseURL: getBaseUrl(),
+  timeout: 15000,
   headers: { 'Content-Type': 'application/json' }
 });
 

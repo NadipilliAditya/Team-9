@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-const API_BASE = ''; // Vite proxy forwards /api/* → http://localhost:5000
+const API_BASE = (() => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
+  if (envUrl) {
+    return envUrl.replace(/\/api\/?$/, '');
+  }
+  return import.meta.env.PROD ? 'https://alumini-connect-08od.onrender.com' : '';
+})();
 
 const AuthContext = createContext(null);
 
